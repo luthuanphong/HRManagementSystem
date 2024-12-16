@@ -1,25 +1,30 @@
 ﻿using HRManagementSystem.DataAccess.Configurations;
 using HRManagementSystem.Entity.Concrete;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+
 
 namespace HRManagementSystem.DataAccess.Concrete
 {
     public class HRContext : DbContext
     {
-        public HRContext(DbContextOptions<HRContext> options) : base(options)
+        private readonly IConfiguration _configuration;
+        public HRContext(DbContextOptions<HRContext> options, IConfiguration configuration) : base(options)
         {
+            _configuration = configuration;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("server=ENES\\SQLEXPRESS;database=HRManagementDB;TrustServerCertificate=true;Trusted_Connection=true");
+            var connectionString = _configuration.GetConnectionString("LOCAL");
+            optionsBuilder.UseSqlServer(connectionString);
         }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new AdvertisementAppUserConfiguration());
